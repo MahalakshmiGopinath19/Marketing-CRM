@@ -1,22 +1,17 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const Tracking = require('../models/Tracking');
 
+const resend = new Resend(process.env.RESEND_API_KEY);
 const BASE_URL = process.env.BASE_URL;
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
 
 const sendEmail = async ({ to, subject, text, campaignId, contactId }) => {
   try {
+    // 🔥 TRACKING URLs
     const openUrl = `${BASE_URL}/api/analytics/track/open?campaign=${campaignId}&contact=${contactId}`;
 
     const clickUrl = `${BASE_URL}/api/analytics/track/click?campaign=${campaignId}&contact=${contactId}&url=https://google.com`;
 
+    // 🔥 EMAIL HTML
     const htmlContent = `
       <h2>${subject}</h2>
       <p>${text}</p>
@@ -27,39 +22,40 @@ const sendEmail = async ({ to, subject, text, campaignId, contactId }) => {
 
       <br/><br/>
 
-      <!--  FORCE OPEN TRACK  -->
+      <!-- FORCE OPEN TRACK -->
       <p>
         📊 View Email:
         <a href="${openUrl}" target="_blank">Open Email</a>
       </p>
 
-      <img src="${openUrl}" width="50" height="50" style="display:block;" />
+      <img src="${openUrl}" width="1" height="1" style="display:none;" />
     `;
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    // 🔥 SEND EMAIL USING RESEND
+    const response = await resend.emails.send({
+      from: 'onboarding@resend.dev', // ⚠️ keep this for now
       to,
       subject,
-      html: htmlContent
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-
-    await Tracking.create({
-      campaignId,
-      contactId,
-      type: 'sent'
+      html: htmlContent,
     });
 
-    return info;
-
-  } catch (error) {
-    console.error(error);
-
+    // ✅ TRACK SENT
     await Tracking.create({
       campaignId,
       contactId,
-      type: 'bounce'
+      type: 'sent',
+    });
+
+    return response;
+
+  } catch (error) {
+    console.error("EMAIL ERROR:", error);
+
+    // ❌ TRACK BOUNCE
+    await Tracking.create({
+      campaignId,
+      contactId,
+      type: 'bounce',
     });
 
     throw error;
