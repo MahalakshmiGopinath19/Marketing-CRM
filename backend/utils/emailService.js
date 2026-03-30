@@ -6,12 +6,16 @@ const BASE_URL = process.env.BASE_URL;
 
 const sendEmail = async ({ to, subject, text, campaignId, contactId }) => {
   try {
+    // 🔥 SAFETY CHECK
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error("Missing RESEND_API_KEY");
+    }
+
     // 🔥 TRACKING URLs
     const openUrl = `${BASE_URL}/api/analytics/track/open?campaign=${campaignId}&contact=${contactId}`;
-
     const clickUrl = `${BASE_URL}/api/analytics/track/click?campaign=${campaignId}&contact=${contactId}&url=https://google.com`;
 
-    // 🔥 EMAIL HTML
+    // 🔥 EMAIL CONTENT
     const htmlContent = `
       <h2>${subject}</h2>
       <p>${text}</p>
@@ -22,7 +26,6 @@ const sendEmail = async ({ to, subject, text, campaignId, contactId }) => {
 
       <br/><br/>
 
-      <!-- FORCE OPEN TRACK -->
       <p>
         📊 View Email:
         <a href="${openUrl}" target="_blank">Open Email</a>
@@ -31,13 +34,17 @@ const sendEmail = async ({ to, subject, text, campaignId, contactId }) => {
       <img src="${openUrl}" width="1" height="1" style="display:none;" />
     `;
 
-    // 🔥 SEND EMAIL USING RESEND
+    console.log("📩 Sending email to:", to);
+
+    // 🔥 SEND EMAIL
     const response = await resend.emails.send({
-      from: 'onboarding@resend.dev', // ⚠️ keep this for now
+      from: 'Maha <onboarding@resend.dev>', // ✅ FIXED
       to,
       subject,
       html: htmlContent,
     });
+
+    console.log("✅ Email sent:", response);
 
     // ✅ TRACK SENT
     await Tracking.create({
@@ -49,9 +56,9 @@ const sendEmail = async ({ to, subject, text, campaignId, contactId }) => {
     return response;
 
   } catch (error) {
-    console.error("EMAIL ERROR:", error);
+    console.error("❌ EMAIL ERROR:", error);
 
-    // ❌ TRACK BOUNCE
+    // ❌ TRACK FAILURE
     await Tracking.create({
       campaignId,
       contactId,
