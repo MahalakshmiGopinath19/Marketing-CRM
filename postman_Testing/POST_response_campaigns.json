@@ -1,0 +1,26 @@
+    {
+    "success":true,
+    "campaign":{
+        "name":"My Campaign",
+        "type":"email",
+        "status":"draft",
+        "targetAudience":{"segments":[]},
+        "budget":{
+            "currency":"USD",
+            "spent":0
+            },
+            "metrics":{
+                "sent":0,
+                "delivered":0,
+                "opened":0,
+                "clicked":0,
+                "converted":0,
+                "bounced":0
+                },
+                "abTest":{"enabled":false},
+                "createdBy":"69caccda980c18ac75d13b27",
+                "_id":"69cace34980c18ac75d13b2a",
+                "createdAt":"2026-03-30T19:25:40.609Z",
+                "__v":0
+                }
+            }

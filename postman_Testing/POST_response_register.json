@@ -1,0 +1,11 @@
+{
+    "success":true,
+    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5Y2FjY2RhOTgwYzE4YWM3NWQxM2IyNyIsImlhdCI6MTc3NDg5ODQwNiwiZXhwIjoxNzc1NTAzMjA2fQ.RABNjqiKB85WHBxz9voMfufh8Jkkxi91Vqpj6jiLljo",
+    "user":
+    {
+        "id":"69caccda980c18ac75d13b27",
+        "name":"Mahiii",
+        "email":"maha@test.com",
+        "role":"user"
+    }
+}
